@@ -5,6 +5,7 @@ import Topbar from "../components/Topbar";
 import Categories from "../components/Categories";
 import Bestseller from "../components/Bestseller";
 import BottomBanner from "../components/BottomBanner";
+import NewsLetter from "../components/NewsLetter";
 
 const Home = ({ navigation }) => {
   return (
@@ -49,6 +50,10 @@ const Home = ({ navigation }) => {
 
         {/* Bottom Banner Section */}
         <BottomBanner />
+
+        {/* Newsletter Section */}
+        <NewsLetter />
+        
       </ScrollView>
 
       {/* Fixed Bottom Navbar */}
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
   },
   
   contentContainer: {
-    paddingBottom: 20,
+    paddingBottom: 300,
     flexGrow: 1, // This ensures content can scroll even if shorter than screen
   },
 

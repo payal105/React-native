@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import Toast from 'react-native-toast-message'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
+import axios from 'axios';
+import { useAppContext } from '../context/AppContext';
 
 const Login = ({ navigation }) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { setUser, fetchUser } = useAppContext(); // ✅ from context
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -15,58 +18,55 @@ const Login = ({ navigation }) => {
         type: 'error',
         text1: 'Missing Fields',
         text2: 'Please enter both email and password',
-      })
-      return
+      });
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/user/login', { // Use your actual API URL
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+      const { data } = await axios.post(
+        '/api/user/login',
+        { email, password },
+        { withCredentials: true } // ✅ important for cookies
+      );
 
-      const data = await response.json()
-      setLoading(false)
+      setLoading(false);
 
       if (data.success) {
-        // Save token for authentication
-        await AsyncStorage.setItem('authToken', data.token)
-
-         // Save username
-        if (data.username) {
-          await AsyncStorage.setItem('username', JSON.stringify(data.username))
-
+        // ✅ Save user in context
+        if (data.user) {
+          setUser(data.user);
         }
+
+        // ✅ Refresh user context (fetch latest user from backend if needed)
+        fetchUser();
 
         Toast.show({
           type: 'success',
           text1: 'Login Successful',
-          text2: 'Redirecting to Home...',
-        })
+          text2: `Welcome back, ${data.user?.name || ''}`,
+        });
 
-        // Redirect to Home after short delay
         setTimeout(() => {
-          navigation.replace('Home') // replace prevents going back to Login
-        }, 1500)
+          navigation.replace('Home');
+        }, 1500);
       } else {
         Toast.show({
           type: 'error',
           text1: 'Login Failed',
           text2: data.message || 'Invalid credentials',
-        })
+        });
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       Toast.show({
         type: 'error',
         text1: 'Network Error',
-        text2: 'Unable to connect to the server',
-      })
-      console.error(error)
+        text2: error.response?.data?.message || error.message,
+      });
+      console.error(error);
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -110,10 +110,10 @@ const Login = ({ navigation }) => {
         </Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
   container: {
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    backgroundColor: '#000',
+    backgroundColor: '#059669',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -181,4 +181,4 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
   },
-})
+});

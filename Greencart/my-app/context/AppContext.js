@@ -4,6 +4,9 @@ import { Alert } from "react-native";
 import axios from "axios";
 import { dummyProducts } from "../assets/assets";
 
+axios.defaults.withCredentials = true;
+
+
 axios.defaults.baseURL = "https://greencart-backend-rosy-phi.vercel.app"; // Replace with your backend URL
 
 export const AppContext = createContext();
@@ -30,19 +33,20 @@ export const AppContextProvider = ({ children }) => {
   };
 
   // Fetch user
-  const fetchUser = async () => {
-    try {
-      const { data } = await axios.get("/api/user/is-auth");
-      if (data.success) {
-        setUser(true);
-        setCartItems(data.user.cartItems || {});
-      } else {
-        setUser(false);
-      }
-    } catch {
-      setUser(false);
+const fetchUser = async () => {
+  try {
+    const { data } = await axios.get("/api/user/is-auth", { withCredentials: true });
+    if (data.success) {
+      setUser(data.user); // store user object { email, name }
+      setCartItems(data.user.cartItems || {});
+    } else {
+      setUser(null);
     }
-  };
+  } catch {
+    setUser(null);
+  }
+};
+
 
   // Fetch products
   const fetchProducts = async () => {

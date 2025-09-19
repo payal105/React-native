@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     marginTop: 96, // equivalent to mt-24 (24 * 4px)
     height: height * 0.6,
     minHeight: 800,
-    marginBottom: 304,
+    marginBottom: 14,
   },
   backgroundImage: {
     width: '100%',
