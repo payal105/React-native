@@ -1,0 +1,23 @@
+npx expo install react-native-web react-dom react-native-svg
+npx expo start --web
+npx expo export -p web
+
+
+npx create-expo-app MyApp --template blank
+
+
+
+vercel.json
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
+  ]
+}
